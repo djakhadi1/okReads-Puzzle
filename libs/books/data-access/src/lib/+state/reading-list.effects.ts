@@ -5,6 +5,7 @@ import * as ReadingListActions from './reading-list.actions';
 import { HttpClient } from '@angular/common/http';
 import { ReadingListItem } from '@tmo/shared/models';
 import { map } from 'rxjs/operators';
+import { AppConstants } from '../../constants/appconstants';
 
 @Injectable()
 export class ReadingListEffects implements OnInitEffects {
@@ -14,7 +15,7 @@ export class ReadingListEffects implements OnInitEffects {
       fetch({
         run: () => {
           return this.http
-            .get<ReadingListItem[]>('/api/reading-list')
+            .get<ReadingListItem[]>(AppConstants.readingApi)
             .pipe(
               map(data =>
                 ReadingListActions.loadReadingListSuccess({ list: data })
@@ -34,7 +35,7 @@ export class ReadingListEffects implements OnInitEffects {
       ofType(ReadingListActions.addToReadingList),
       optimisticUpdate({
         run: ({ book }) => {
-          return this.http.post('/api/reading-list', book).pipe(
+          return this.http.post(AppConstants.readingApi, book).pipe(
             map(() =>
               ReadingListActions.confirmedAddToReadingList({
                 book
@@ -56,13 +57,15 @@ export class ReadingListEffects implements OnInitEffects {
       ofType(ReadingListActions.removeFromReadingList),
       optimisticUpdate({
         run: ({ item }) => {
-          return this.http.delete(`/api/reading-list/${item.bookId}`).pipe(
-            map(() =>
-              ReadingListActions.confirmedRemoveFromReadingList({
-                item
-              })
-            )
-          );
+          return this.http
+            .delete(`${AppConstants.readingApi}/${item.bookId}`)
+            .pipe(
+              map(() =>
+                ReadingListActions.confirmedRemoveFromReadingList({
+                  item
+                })
+              )
+            );
         },
         undoAction: ({ item }) => {
           return ReadingListActions.failedRemoveFromReadingList({

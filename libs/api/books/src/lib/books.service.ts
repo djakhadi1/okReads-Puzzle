@@ -16,19 +16,21 @@ export class BooksService {
       .get(`https://www.googleapis.com/books/v1/volumes?q=${term}`)
       .pipe(
         map(resp => {
-          return resp.data.items.map(item => {
-            return {
-              id: item.id,
-              title: item.volumeInfo?.title,
-              authors: item.volumeInfo?.authors || [],
-              description: item.searchInfo?.textSnippet,
-              publisher: item.volumeInfo?.publisher,
-              publishedDate: item.volumeInfo?.publishedDate
-                ? new Date(item.volumeInfo?.publishedDate).toISOString()
-                : undefined,
-              coverUrl: item.volumeInfo?.imageLinks?.thumbnail
-            };
-          });
+          if (resp.data.items) {
+            return resp.data.items.map(item => {
+              return {
+                id: item.id,
+                title: item.volumeInfo?.title,
+                authors: item.volumeInfo?.authors || [],
+                description: item.searchInfo?.textSnippet,
+                publisher: item.volumeInfo?.publisher,
+                publishedDate: item.volumeInfo?.publishedDate
+                  ? new Date(item.volumeInfo?.publishedDate).toISOString()
+                  : undefined,
+                coverUrl: item.volumeInfo?.imageLinks?.thumbnail
+              };
+            });
+          }
         })
       );
   }
