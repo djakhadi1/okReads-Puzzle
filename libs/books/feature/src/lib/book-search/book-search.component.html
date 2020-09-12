@@ -7,6 +7,7 @@
       placeholder="Search for books to add to your reading list"
       formControlName="term"
       autocomplete="off"
+      (keyup)="AutoSearch($event)"
     />
     <button mat-icon-button matSuffix aria-label="search">
       <mat-icon>search</mat-icon>
@@ -49,9 +50,7 @@
 <ng-template #empty>
   <div class="empty">
     <p>
-      Try searching for a topic, for example "<a
-        (click)="searchExample()"
-        title="JavaScript"
+      Try searching for a topic, for example "<a (click)="searchExample()"
         >JavaScript</a
       >".
     </p>
