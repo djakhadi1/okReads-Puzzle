@@ -51,4 +51,4 @@
 
 * Unsubscribed all subscriptions on ngDestroy() from book-search component, which will not cause any memory leaks issues in future.
 
-* Use async pipe for books subscription to an Observable
+* Used async pipe for books subscription to an Observable
