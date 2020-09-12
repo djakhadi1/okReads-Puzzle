@@ -5,6 +5,7 @@ import * as BooksActions from './books.actions';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Book } from '@tmo/shared/models';
+import { AppConstants } from '../../constants/appconstants';
 
 @Injectable()
 export class BooksEffects {
@@ -14,7 +15,7 @@ export class BooksEffects {
       fetch({
         run: action => {
           return this.http
-            .get<Book[]>(`/api/books/search?q=${action.term}`)
+            .get<Book[]>(`${AppConstants.bookSearchApi}?q=${action.term}`)
             .pipe(
               map(data => BooksActions.searchBooksSuccess({ books: data }))
             );
