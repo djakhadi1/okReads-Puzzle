@@ -1,23 +1,26 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   addToReadingList,
   clearSearch,
   getAllBooks,
   ReadingListBook,
-  searchBooks
+  searchBooks,
+  removeFromReadingList,
+  UndoAddToReadingList
 } from '@tmo/books/data-access';
 import { FormBuilder } from '@angular/forms';
 import { Book } from '@tmo/shared/models';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { GlobalConstant } from '../../constants';
 
 @Component({
   selector: 'tmo-book-search',
   templateUrl: './book-search.component.html',
   styleUrls: ['./book-search.component.scss']
 })
-export class BookSearchComponent implements OnInit, OnDestroy {
+export class BookSearchComponent implements OnInit {
   books: ReadingListBook[];
-  booksSubscription: any;
 
   searchForm = this.fb.group({
     term: ''
@@ -25,7 +28,8 @@ export class BookSearchComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly store: Store,
-    private readonly fb: FormBuilder
+    private readonly fb: FormBuilder,
+    private _snackBar: MatSnackBar
   ) {}
 
   get searchTerm(): string {
@@ -33,7 +37,7 @@ export class BookSearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.booksSubscription = this.store.select(getAllBooks).subscribe(books => {
+    this.store.select(getAllBooks).subscribe(books => {
       this.books = books;
     });
   }
@@ -46,6 +50,16 @@ export class BookSearchComponent implements OnInit, OnDestroy {
 
   addBookToReadingList(book: Book) {
     this.store.dispatch(addToReadingList({ book }));
+    const snackBarRef = this._snackBar.open(
+      GlobalConstant.Add,
+      GlobalConstant.Undo,
+      {
+        duration: GlobalConstant.FiveThousand
+      }
+    );
+    snackBarRef.onAction().subscribe(() => {
+      this.store.dispatch(UndoAddToReadingList({ book }));
+    });
   }
 
   searchExample() {
@@ -58,11 +72,6 @@ export class BookSearchComponent implements OnInit, OnDestroy {
       this.store.dispatch(searchBooks({ term: this.searchTerm }));
     } else {
       this.store.dispatch(clearSearch());
-    }
-  }
-  ngOnDestroy() {
-    if (this.booksSubscription) {
-      this.booksSubscription.unsubscribe();
     }
   }
 }
